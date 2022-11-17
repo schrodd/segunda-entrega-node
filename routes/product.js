@@ -10,6 +10,10 @@ productRoutes.get("/", async (req, res) => {
   const data = await collection.getAll()
   res.send(data)
 })
+productRoutes.get("/:id", async (req, res) => {
+  const data = await collection.query()
+  res.send(data)
+})
 
 productRoutes.post("/", async (req, res) => {
   // Validacion de datos

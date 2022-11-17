@@ -23,6 +23,8 @@ export class firebaseCollection {
     this.setDoc = firestore.setDoc
     this.doc = firestore.doc
     this.deleteDoc = firestore.deleteDoc
+    this.query = firestore.query
+    this.where = firestore.where
   }
   async add(obj){ //create
     try {
@@ -41,6 +43,22 @@ export class firebaseCollection {
       const result = []
       querySnapshot.forEach((doc) => {
         result.push({id: doc.id, ...doc.data()})
+      })
+      return result
+    } catch (error) {
+      console.log(error)
+      return {status: "Error"}
+    }
+  }
+  async query(){
+    console.log("as")
+    try {
+      const result = []
+      const q = this.query(this.collection(this.db, this.collectionName), this.where("edad", "==", 3))
+      const querySnapshot = await this.getDocs(q)
+      console.log(querySnapshot)
+      querySnapshot.forEach((doc) => {
+        result.push({id: doc.id, ...doc.data()}) 
       })
       return result
     } catch (error) {
