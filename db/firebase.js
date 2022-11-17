@@ -22,6 +22,7 @@ export class firebaseCollection {
     this.getDocs = firestore.getDocs
     this.setDoc = firestore.setDoc
     this.doc = firestore.doc
+    this.deleteDoc = firestore.deleteDoc
   }
   async add(obj){ //create
     try {
@@ -35,12 +36,17 @@ export class firebaseCollection {
   }
   // Read
   async getAll(){ 
-    const querySnapshot = await this.getDocs(this.collection(this.db, this.collectionName));
-    const result = []
-    querySnapshot.forEach((doc) => {
-      result.push({id: doc.id, ...doc.data()})
-    })
-    return result
+    try {
+      const querySnapshot = await this.getDocs(this.collection(this.db, this.collectionName));
+      const result = []
+      querySnapshot.forEach((doc) => {
+        result.push({id: doc.id, ...doc.data()})
+      })
+      return result
+    } catch (error) {
+      console.log(error)
+      return {status: "Error"}
+    }
   }
   async update(id, prop, val){
     try {
@@ -48,9 +54,19 @@ export class firebaseCollection {
       const changes = {}
       changes[prop] = val
       this.setDoc(docRef, changes, { merge: true });
-      return "ok"
+      return {status: "Success"}
     } catch (error) {
       console.log(error)
+      return {status: "Error"}
+    }
+  }
+  async delete(id){
+    try {
+      await this.deleteDoc(this.doc(this.db, this.collectionName, id))
+      return {status: "Success"}
+    } catch (error) {
+      console.log(error)
+      return {status: "Error"}
     }
   }
 }

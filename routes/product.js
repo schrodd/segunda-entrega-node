@@ -17,5 +17,9 @@ productRoutes.post("/", async (req, res) => {
 })
 
 productRoutes.put("/", async (req, res) => {
-  res.send(await collection.update("OabKplfMwSUGlxKEqnNK", "edad", 5))
+  res.send(await collection.update(req.body.id, req.body.prop, req.body.val))
+})
+
+productRoutes.delete("/", async (req, res) => {
+  res.send(await collection.delete(req.body.id))
 })
