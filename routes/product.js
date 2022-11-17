@@ -7,11 +7,15 @@ const collection = await collectionFactory('products')
 // según cada solicitud
 
 productRoutes.get("/", async (req, res) => {
-  const data = await collection.get()
+  const data = await collection.getAll()
   res.send(data)
 })
 
 productRoutes.post("/", async (req, res) => {
   // Validacion de datos
-  res.send(await collection.create(req.body))
+  res.send(await collection.add(req.body))
+})
+
+productRoutes.put("/", async (req, res) => {
+  res.send(await collection.update("OabKplfMwSUGlxKEqnNK", "edad", 5))
 })

@@ -20,8 +20,10 @@ export class firebaseCollection {
     this.collection = firestore.collection
     this.addDoc = firestore.addDoc
     this.getDocs = firestore.getDocs
+    this.setDoc = firestore.setDoc
+    this.doc = firestore.doc
   }
-  async create(obj){
+  async add(obj){ //create
     try {
       const docRef = await this.addDoc(this.collection(this.db, this.collectionName), obj);
       console.log("Document written with ID: ", docRef.id);
@@ -31,12 +33,24 @@ export class firebaseCollection {
       return {status: "Error"}
     }
   }
-  async get(){
+  // Read
+  async getAll(){ 
     const querySnapshot = await this.getDocs(this.collection(this.db, this.collectionName));
     const result = []
     querySnapshot.forEach((doc) => {
       result.push({id: doc.id, ...doc.data()})
     })
     return result
+  }
+  async update(id, prop, val){
+    try {
+      const docRef = this.doc(this.db, this.collectionName, id);
+      const changes = {}
+      changes[prop] = val
+      this.setDoc(docRef, changes, { merge: true });
+      return "ok"
+    } catch (error) {
+      console.log(error)
+    }
   }
 }
