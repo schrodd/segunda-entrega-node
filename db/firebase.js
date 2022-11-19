@@ -17,18 +17,12 @@ export class firebaseCollection {
     }
     this.app = app.initializeApp(this.firebaseConfig)
     this.db = firestore.getFirestore(this.app)
-    this.collection = firestore.collection
-    this.addDoc = firestore.addDoc
-    this.getDocs = firestore.getDocs
-    this.setDoc = firestore.setDoc
-    this.doc = firestore.doc
-    this.deleteDoc = firestore.deleteDoc
-    this.query = firestore.query
-    this.where = firestore.where
+    this.firestore = firestore
   }
   async add(obj){ //create
     try {
-      const docRef = await this.addDoc(this.collection(this.db, this.collectionName), obj);
+      obj.timestamp = new Date(Date.now()).toLocaleString()
+      const docRef = await this.firestore.addDoc(this.firestore.collection(this.db, this.collectionName), obj);
       console.log("Document written with ID: ", docRef.id);
       return {status: "Success"}
     } catch (e) {
@@ -39,7 +33,7 @@ export class firebaseCollection {
   // Read
   async getAll(){ 
     try {
-      const querySnapshot = await this.getDocs(this.collection(this.db, this.collectionName));
+      const querySnapshot = await this.firestore.getDocs(this.firestore.collection(this.db, this.collectionName));
       const result = []
       querySnapshot.forEach((doc) => {
         result.push({id: doc.id, ...doc.data()})
@@ -50,17 +44,11 @@ export class firebaseCollection {
       return {status: "Error"}
     }
   }
-  async query(){
-    console.log("as")
+  async get(id){
     try {
-      const result = []
-      const q = this.query(this.collection(this.db, this.collectionName), this.where("edad", "==", 3))
-      const querySnapshot = await this.getDocs(q)
-      console.log(querySnapshot)
-      querySnapshot.forEach((doc) => {
-        result.push({id: doc.id, ...doc.data()}) 
-      })
-      return result
+      const docRef = this.firestore.doc(this.db, this.collectionName, id);
+      const docSnap = await this.firestore.getDoc(docRef);
+      return { id:docSnap.id, ...docSnap.data() }
     } catch (error) {
       console.log(error)
       return {status: "Error"}
@@ -68,10 +56,10 @@ export class firebaseCollection {
   }
   async update(id, prop, val){
     try {
-      const docRef = this.doc(this.db, this.collectionName, id);
+      const docRef = this.firestore.doc(this.db, this.collectionName, id);
       const changes = {}
       changes[prop] = val
-      this.setDoc(docRef, changes, { merge: true });
+      this.firestore.setDoc(docRef, changes, { merge: true });
       return {status: "Success"}
     } catch (error) {
       console.log(error)
@@ -80,7 +68,7 @@ export class firebaseCollection {
   }
   async delete(id){
     try {
-      await this.deleteDoc(this.doc(this.db, this.collectionName, id))
+      await this.firestore.deleteDoc(this.firestore.doc(this.db, this.collectionName, id))
       return {status: "Success"}
     } catch (error) {
       console.log(error)
